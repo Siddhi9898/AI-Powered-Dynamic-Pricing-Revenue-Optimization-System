@@ -27,15 +27,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# 📥 LOAD MODEL
+# 📥 LOAD MODEL (SAFE LOAD)
 # -----------------------------
-model = joblib.load("model.pkl")
+@st.cache_resource
+def load_model():
+    return joblib.load("model.pkl")  # make sure filename matches repo
+
+model = load_model()
 
 # -----------------------------
 # 🧾 TITLE
 # -----------------------------
 st.title("🚀 AI-Powered Dynamic Pricing & Revenue Optimization System")
-st.markdown("Optimize pricing using AI-driven demand prediction, simulation, and strategy recommendations.")
+st.success("✅ Live AI Pricing Engine Running")
+st.caption("Built with Machine Learning for real-time pricing optimization")
 
 st.markdown("---")
 
@@ -58,22 +63,27 @@ with col3:
 # -----------------------------
 # 🔮 PREDICTION
 # -----------------------------
-demand = model.predict([[price]])[0]
+# Adjust input shape depending on your model training
+try:
+    demand = model.predict([[price]])[0]
+except:
+    demand = model.predict([[price, competitor_price]])[0]
+
 revenue = price * demand
 profit = (price - cost) * demand
 
 # -----------------------------
-# 🔄 SIMULATION
+# 🔄 SIMULATION (OPTIMIZED)
 # -----------------------------
 price_range = np.linspace(100, 1000, 50)
 
-revenues = []
-profits = []
+try:
+    predictions = model.predict(price_range.reshape(-1, 1))
+except:
+    predictions = model.predict(np.column_stack((price_range, [competitor_price]*50)))
 
-for p in price_range:
-    d = model.predict([[p]])[0]
-    revenues.append(p * d)
-    profits.append((p - cost) * d)
+revenues = price_range * predictions
+profits = (price_range - cost) * predictions
 
 # -----------------------------
 # 🧠 OPTIMIZATION
@@ -139,18 +149,22 @@ with col4:
 st.markdown("---")
 st.header("📈 Price Simulation")
 
-fig1 = plt.figure()
-plt.plot(price_range, revenues)
-plt.xlabel("Price")
-plt.ylabel("Revenue")
-plt.title("Price vs Revenue")
+# Revenue graph
+fig1, ax1 = plt.subplots()
+ax1.plot(price_range, revenues)
+ax1.axvline(best_price, linestyle='--')
+ax1.set_xlabel("Price")
+ax1.set_ylabel("Revenue")
+ax1.set_title("Price vs Revenue")
 st.pyplot(fig1)
 
-fig2 = plt.figure()
-plt.plot(price_range, profits)
-plt.xlabel("Price")
-plt.ylabel("Profit")
-plt.title("Price vs Profit")
+# Profit graph
+fig2, ax2 = plt.subplots()
+ax2.plot(price_range, profits)
+ax2.axvline(best_price, linestyle='--')
+ax2.set_xlabel("Price")
+ax2.set_ylabel("Profit")
+ax2.set_title("Price vs Profit")
 st.pyplot(fig2)
 
 # -----------------------------
