@@ -36,10 +36,6 @@ This system predicts demand using a trained ML model and simulates pricing strat
 4. System simulates multiple prices.
 5. System recommends the best pricing strategy.
 
-## Screenshots
-
-Screenshots of the application and results can be added here.
-
 ## Deployment
 
 Deployed using Streamlit Community Cloud.
