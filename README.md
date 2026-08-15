@@ -42,4 +42,4 @@ Deployed using Streamlit Community Cloud.
 
 ## Author
 
-Your Name
+Siddhi Bhingare
